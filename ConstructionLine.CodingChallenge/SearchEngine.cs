@@ -33,7 +33,7 @@ namespace ConstructionLine.CodingChallenge
                     ),
                 (shirt, state, tuple) =>
                 {
-                    if (ShirtSizeMatches(shirt, options) && ShirtColorMatches(shirt, options))
+                    if (ShirtSizeMatches(shirt, options.Sizes) && ShirtColorMatches(shirt, options.Colors))
                     {
                         tuple.shirts.Add(shirt);
                         tuple.sizeCount[shirt.Size.Id].Count++;
@@ -71,24 +71,24 @@ namespace ConstructionLine.CodingChallenge
             };
         }
 
-        private static bool ShirtSizeMatches(Shirt shirt, SearchOptions options)
+        private static bool ShirtSizeMatches(Shirt shirt, IReadOnlyCollection<Size> optionsSizes)
         {
-            return !FilterBySize(options) || options.Sizes.SingleOrDefault(size => shirt.Size == size) != null;
+            return !FilterBySize(optionsSizes) || optionsSizes.SingleOrDefault(size => shirt.Size == size) != null;
         }
 
-        private static bool ShirtColorMatches(Shirt shirt, SearchOptions options)
+        private static bool ShirtColorMatches(Shirt shirt, IReadOnlyCollection<Color> optionsColors)
         {
-            return !FilterByColor(options) || options.Colors.SingleOrDefault(color => shirt.Color == color) != null;
+            return !FilterByColor(optionsColors) || optionsColors.SingleOrDefault(color => shirt.Color == color) != null;
         }
 
-        private static bool FilterBySize(SearchOptions options)
+        private static bool FilterBySize(IEnumerable<Size> optionsSizes)
         {
-            return options.Sizes.Any();
+            return optionsSizes.Any();
         }
 
-        private static bool FilterByColor(SearchOptions options)
+        private static bool FilterByColor(IEnumerable<Color> optionsColors)
         {
-            return options.Colors.Any();
+            return optionsColors.Any();
         }
 
         private static Dictionary<Guid, SizeCount> InitializeSizeCount()
@@ -106,8 +106,8 @@ namespace ConstructionLine.CodingChallenge
         public SearchResults SearchAsParallel(SearchOptions options)
         {
             var filteredShirts = _shirts.AsParallel().Where(shirt =>
-                (!FilterBySize(options) || options.Sizes.Any(s => s == shirt.Size)) &&
-                (!FilterByColor(options) || options.Colors.Any(c => c == shirt.Color))).ToList();
+                (!FilterBySize(options.Sizes) || options.Sizes.Any(s => s == shirt.Size)) &&
+                (!FilterByColor(options.Colors) || options.Colors.Any(c => c == shirt.Color))).ToList();
 
             return new SearchResults(filteredShirts);
         }
