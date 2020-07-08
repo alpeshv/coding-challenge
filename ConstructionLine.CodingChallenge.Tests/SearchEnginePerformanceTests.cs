@@ -15,7 +15,7 @@ namespace ConstructionLine.CodingChallenge.Tests
         [SetUp]
         public void Setup()
         {
-            
+
             var dataBuilder = new SampleDataBuilder(50000);
 
             _shirts = dataBuilder.CreateShirts();
@@ -25,51 +25,47 @@ namespace ConstructionLine.CodingChallenge.Tests
 
 
         [Test]
+        [Repeat(10)]
         public void PerformanceTest()
         {
-            for (var i = 0; i < 11; i++)
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var options = new SearchOptions
             {
-                var sw = new Stopwatch();
-                sw.Start();
+                Colors = new List<Color> { Color.Red }
+            };
 
-                var options = new SearchOptions
-                {
-                    Colors = new List<Color> {Color.Red}
-                };
+            var results = _searchEngine.Search(options);
 
-                var results = _searchEngine.Search(options);
+            sw.Stop();
+            Console.WriteLine($"Test fixture finished in {sw.ElapsedMilliseconds} milliseconds");
 
-                sw.Stop();
-                Console.WriteLine($"Test fixture finished in {sw.ElapsedMilliseconds} milliseconds");
-
-                AssertResults(results.Shirts, options);
-                AssertSizeCounts(_shirts, options, results.SizeCounts);
-                AssertColorCounts(_shirts, options, results.ColorCounts);
-            }
+            AssertResults(results.Shirts, options);
+            AssertSizeCounts(_shirts, options, results.SizeCounts);
+            AssertColorCounts(_shirts, options, results.ColorCounts);
         }
 
         [Test]
+        [Repeat(10)]
         public void PerformanceTestAsParrallel()
         {
-            for (var i = 0; i < 11; i++)
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var options = new SearchOptions
             {
-                var sw = new Stopwatch();
-                sw.Start();
+                Colors = new List<Color> { Color.Red }
+            };
 
-                var options = new SearchOptions
-                {
-                    Colors = new List<Color> { Color.Red }
-                };
+            var results = _searchEngine.SearchAsParallel(options);
 
-                var results = _searchEngine.SearchAsParallel(options);
+            sw.Stop();
+            Console.WriteLine($"Test fixture finished in {sw.ElapsedMilliseconds} milliseconds");
 
-                sw.Stop();
-                Console.WriteLine($"Test fixture finished in {sw.ElapsedMilliseconds} milliseconds");
-
-                AssertResults(results.Shirts, options);
-                AssertSizeCounts(_shirts, options, results.SizeCounts);
-                AssertColorCounts(_shirts, options, results.ColorCounts);
-            }
+            AssertResults(results.Shirts, options);
+            AssertSizeCounts(_shirts, options, results.SizeCounts);
+            AssertColorCounts(_shirts, options, results.ColorCounts);
         }
     }
 }
